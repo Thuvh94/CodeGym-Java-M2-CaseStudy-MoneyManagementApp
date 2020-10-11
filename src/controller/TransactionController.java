@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 import model.IncomeType;
 import model.Money;
 import model.OutcomeType;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class TransactionController implements Initializable {
@@ -55,8 +57,8 @@ public class TransactionController implements Initializable {
     private DatePicker transactionDate;
 
     public static ObservableList<Money> transactionList = FXCollections.observableArrayList();
-    private long totalIncome;
-    private long totalOutcome;
+    private long totalIncome = 0;
+    private long totalOutcome = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -170,5 +172,48 @@ public class TransactionController implements Initializable {
     }
     private void setRealMoneyLabel(){
         realMoneyLabel.setText(String.valueOf(getTotalIncome()-getTotalOutcome()));
+    }
+
+    // get selected item in table row
+    public void confirmUserAction(){
+        Money selectedMoney = allTransactionTable.getSelectionModel().getSelectedItem();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Xác nhận thao tác");
+        alert.setContentText("Lựa chọn thao tác bạn muốn thực hiện");
+
+        ButtonType buttonEdit = new ButtonType("Chỉnh sửa");
+        ButtonType buttonDelete = new ButtonType("Xóa");
+        ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonEdit, buttonDelete, buttonCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonEdit){
+            editActionSelected(selectedMoney);
+        } else if (result.get() == buttonDelete) {
+            deleteActionSelected(selectedMoney);
+        } else {
+            alert.close();
+        }
+    }
+
+    public void editActionSelected(Money Obj){
+        displayValueForEdit(Obj);
+
+    }
+    public void deleteActionSelected(Money Obj){
+        System.out.println("Delete");
+        transactionList.remove(Obj);
+        addTransactionToTable(transactionList);
+    }
+
+    public void displayValueForEdit(Money Obj){
+        amountText.setText(String.valueOf(Obj.getAmount()));
+        if(Obj.isIncome())
+            incomeRadioBtn.setSelected(true);
+        else
+            outcomeRadioBtn.setSelected(true);
+        transactionDescription.setText(Obj.getDescription());
+        transactionDate.setValue(Obj.getDate());
     }
 }
