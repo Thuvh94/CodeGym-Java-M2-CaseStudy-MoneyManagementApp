@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="782.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TransactionController">
+   <children>
+      <TableView fx:id="allTransactionTable" layoutX="24.0" layoutY="146.0" prefHeight="316.0" prefWidth="300.0">
+        <columns>
+          <TableColumn fx:id="transactionDateColumn" prefWidth="75.0" text="Ngày" />
+          <TableColumn fx:id="transactionDetailColumn" prefWidth="127.0" text="Mục chi tiêu" />
+            <TableColumn fx:id="transactionAmountColumn" prefWidth="97.0" text="Số tiền" />
+        </columns>
+      </TableView>
+      <Label layoutX="31.0" layoutY="51.0" text="Tổng thu nhập" />
+      <Label layoutX="35.0" layoutY="75.0" text="Tổng chi tiêu" />
+      <Label layoutX="109.0" layoutY="10.0" text="LoveMoney">
+         <font>
+            <Font name="System Bold" size="21.0" />
+         </font>
+      </Label>
+      <Label fx:id="totalIncomeLabel" layoutX="242.0" layoutY="51.0" text="0" textAlignment="RIGHT" />
+      <Label fx:id="totalOutcomeLabel" layoutX="242.0" layoutY="75.0" text="0 " textAlignment="RIGHT" />
+      <Line endX="112.0" layoutX="205.0" layoutY="100.0" startX="-19.0" />
+      <Label fx:id="realMoneyLabel" layoutX="242.0" layoutY="109.0" text="0" textAlignment="RIGHT" />
+      <Label layoutX="293.0" layoutY="52.0" text="VNĐ" />
+      <Label layoutX="292.0" layoutY="75.0" text="VNĐ" />
+      <Label layoutX="292.0" layoutY="109.0" text="VNĐ" />
+      <Label layoutX="497.0" layoutY="13.0" prefHeight="35.0" prefWidth="199.0" text="Thêm Giao dịch">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="transactionDate" layoutX="494.0" layoutY="353.0" prefHeight="25.0" prefWidth="199.0" />
+      <TextField fx:id="transactionDescription" layoutX="494.0" layoutY="281.0" prefHeight="30.0" prefWidth="199.0" />
+      <TextField fx:id="amountText" layoutX="497.0" layoutY="116.0" onInputMethodTextChanged="#validateAmountTextField" onKeyPressed="#validateAmountTextField" prefHeight="30.0" prefWidth="199.0" />
+      <Label layoutX="419.0" layoutY="116.0" prefHeight="30.0" prefWidth="51.0" text="Số tiền">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="417.0" layoutY="219.0" prefHeight="30.0" prefWidth="79.0" text="Chọn nhóm">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="417.0" layoutY="279.0" prefHeight="30.0" prefWidth="79.0" text="Ghi chú">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="417.0" layoutY="357.0" prefHeight="20.0" prefWidth="86.0" text="Chọn ngày">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="saveTransactionBtn" layoutX="568.0" layoutY="430.0" mnemonicParsing="false" onAction="#saveTransaction" prefHeight="25.0" prefWidth="65.0" text="Save" />
+      <RadioButton fx:id="incomeRadioBtn" layoutX="496.0" layoutY="183.0" mnemonicParsing="false" onAction="#chooseOutcomeTransaction" text="Chi tiêu">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <toggleGroup>
+            <ToggleGroup fx:id="IncomeOrOutCome" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="outcomeRadioBtn" layoutX="609.0" layoutY="183.0" mnemonicParsing="false" onAction="#chooseIncomeTransaction" text="Thu nhập" toggleGroup="$IncomeOrOutCome">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </RadioButton>
+
+      <ChoiceBox fx:id="transactionGroup" layoutX="496.0" layoutY="222.0" prefHeight="25.0" prefWidth="199.0" />
+      <Label fx:id="amountNoticeLabel" alignment="CENTER_RIGHT" layoutX="495.0" layoutY="150.0" text="* Vui lòng nhập ký tự số" textAlignment="RIGHT" textFill="#f80a0a" visible="false" />
+   </children>
+</Pane>
