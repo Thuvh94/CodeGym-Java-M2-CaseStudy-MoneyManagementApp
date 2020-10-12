@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class TransactionController implements Initializable {
-   //  all transaction components
+    //  all transaction components
     @FXML
     private TableView<Money> allTransactionTable;
     @FXML
@@ -155,7 +155,7 @@ public class TransactionController implements Initializable {
         allTransactionTable.setItems(list);
     }
 
-     //Get total income and outcome and display in label
+    //Get total income and outcome and display in label
 //    private void setOverViewLabel(Money moneyObj){
 //        if(moneyObj.isIncome()){
 //            setTotalIncomeLabel();
@@ -190,7 +190,7 @@ public class TransactionController implements Initializable {
     }
 
     // get selected item in table row
-    public void confirmUserAction(){
+        public void confirmUserAction(){
         Money selectedMoney = allTransactionTable.getSelectionModel().getSelectedItem();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
@@ -206,11 +206,30 @@ public class TransactionController implements Initializable {
         if (result.get() == buttonEdit){
             editActionSelected(selectedMoney);
         } else if (result.get() == buttonDelete) {
-            deleteActionSelected(selectedMoney);
+            confirmDeleteDialog(selectedMoney);
         } else {
             alert.close();
         }
     }
+
+    public void confirmDeleteDialog(Money money){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Xác nhận thao tác");
+        alert.setContentText("Bạn có chắc chắn muốn xóa giao dịch này?");
+
+        ButtonType buttonYes = new ButtonType("Xóa");
+        ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonYes, buttonCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonYes){
+            deleteActionSelected(money);
+        } else {
+            alert.close();
+        }
+    }
+
 
     public void editActionSelected(Money Obj){
         displayValueForEdit(Obj);

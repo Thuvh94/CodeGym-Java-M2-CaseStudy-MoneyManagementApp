@@ -1,8 +1,10 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class Money {
+    private UUID uuid;
     private long amount;
     private boolean isIncome;
     private String description;
@@ -12,14 +14,16 @@ public class Money {
     public Money() {
     }
 
-    public Money(long amount, boolean isIncome, String description, LocalDate date) {
+    public Money(long amount, boolean isIncome, String description, MoneyType moneyType,LocalDate date) {
         this.amount = amount;
         this.isIncome = isIncome;
         this.description = description;
+        this.moneyType = moneyType;
         this.date = date;
     }
 
-    public Money(long amount, boolean isIncome, String description, MoneyType moneyType, LocalDate date) {
+    public Money(UUID uuid, long amount, boolean isIncome, String description, MoneyType moneyType, LocalDate date) {
+        this.uuid = uuid;
         this.amount = amount;
         this.isIncome = isIncome;
         this.description = description;
@@ -76,5 +80,13 @@ public class Money {
                 ", moneyType=" + moneyType +
                 ", date=" + date +
                 '}';
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 }

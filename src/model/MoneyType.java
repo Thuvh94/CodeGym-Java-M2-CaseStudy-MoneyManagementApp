@@ -8,10 +8,6 @@ public class MoneyType {
     public MoneyType() {
     }
 
-//    public MoneyType(String name) {
-//        this.name = name;
-//    }
-
     public MoneyType(int id,boolean isIncomeType, String name) {
         this.id = id;
         this.isIncomeType = isIncomeType;
