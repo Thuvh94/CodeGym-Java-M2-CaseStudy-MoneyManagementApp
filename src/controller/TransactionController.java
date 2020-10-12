@@ -85,7 +85,6 @@ public class TransactionController implements Initializable {
 
     // When choose income or outcome, the dropdown list of transaction types are changed
     public void chooseIncomeTransaction(ActionEvent actionEvent) {
-        // Khi chọn income thì các chi tiêu trong phần loại sẽ khác với outcome
         System.out.println("User choose income transaction");
         transactionGroup.getItems().clear();
         List<MoneyType> incomeTypes = new MoneyTypeManagement().findIncomeTypeList();
@@ -96,7 +95,6 @@ public class TransactionController implements Initializable {
     }
 
     public void chooseOutcomeTransaction(ActionEvent actionEvent) {
-        // Khi chọn outcome thì các chi tiêu trong phần loại sẽ khác với income
         System.out.println("User choose outcome transaction");
         transactionGroup.getItems().clear();
         List<MoneyType> outcomeTypes = new MoneyTypeManagement().findOutcomeTypeList();
@@ -110,12 +108,11 @@ public class TransactionController implements Initializable {
     public void saveTransaction(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
         Money inputMoneyObj = getInputMoneyObj();
         transactionList.add(inputMoneyObj);
-        setTotalIncomeLabel(totalIncome);
-        setTotalOutcomeLabel(totalOutcome);
-        setRealMoneyLabel();
         addTransactionToTable(transactionList);
         clearInputFields();
         System.out.println(transactionList);
+        getOverviewNum();
+        setLabel();
     }
 
     public Money getInputMoneyObj() {
@@ -124,14 +121,11 @@ public class TransactionController implements Initializable {
         long inputAmount = Long.parseLong(amountText.getText());
         boolean isIncome = true;
         if (incomeRadioBtn.isSelected() && transactionGroup.getValue() != null){
-//            inputMoneyObj.setIncome(true);
             isIncome = true;
-            totalIncome+=inputAmount;
         }
 
         else if (outcomeRadioBtn.isSelected() && transactionGroup.getValue()!=null){
             isIncome = false;
-            totalOutcome+=inputAmount;
         }
         MoneyType moneyType = (MoneyType) transactionGroup.getValue();
         String inputDescription = transactionDescription.getText();
@@ -157,14 +151,21 @@ public class TransactionController implements Initializable {
         transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         allTransactionTable.setItems(list);
     }
-
-    private void setTotalIncomeLabel(long number){
+    private void getOverviewNum(){
+        long income = 0;
+        long outcome = 0;
+        for (int i = 0; i < transactionList.size(); i++) {
+            if(transactionList.get(i).isIncome())
+                income+=transactionList.get(i).getAmount();
+            else
+               outcome +=transactionList.get(i).getAmount();
+        }
+        totalIncome = income;
+        totalOutcome = outcome;
+    }
+    private void setLabel(){
         totalIncomeLabel.setText(String.valueOf(totalIncome));
-    }
-    private void setTotalOutcomeLabel(long number){
         totalOutcomeLabel.setText(String.valueOf(totalOutcome));
-    }
-    private void setRealMoneyLabel(){
         realMoneyLabel.setText(String.valueOf(totalIncome - totalOutcome));
     }
 
@@ -173,6 +174,7 @@ public class TransactionController implements Initializable {
         Money selectedMoney = allTransactionTable.getSelectionModel().getSelectedItem();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
+        alert.setHeaderText(null);
         alert.setContentText("Lựa chọn thao tác bạn muốn thực hiện");
 
         ButtonType buttonEdit = new ButtonType("Chỉnh sửa");
@@ -194,6 +196,7 @@ public class TransactionController implements Initializable {
     public void confirmDeleteDialog(Money money){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
+        alert.setHeaderText(null);
         alert.setContentText("Bạn có chắc chắn muốn xóa giao dịch này?");
 
         ButtonType buttonYes = new ButtonType("Xóa");
@@ -220,10 +223,11 @@ public class TransactionController implements Initializable {
                 addTransactionToTable(transactionList);
                 allTransactionTable.refresh();
                 System.out.println("list" + transactionList);
+                clearInputFields();
+                getOverviewNum();
+                setLabel();
             }
         });
-//        int index = transactionList.indexOf(Obj);
-        // code edit
     }
 
     public void editTransaction(Money Obj){
@@ -245,16 +249,8 @@ public class TransactionController implements Initializable {
         System.out.println("Delete");
         transactionList.remove(Obj);
         addTransactionToTable(transactionList);
-        if(Obj.isIncome()){
-            totalIncome = totalIncome - Obj.getAmount();
-            setTotalIncomeLabel(totalIncome);
-            setRealMoneyLabel();
-        }
-        else{
-            totalOutcome = totalOutcome - Obj.getAmount();
-            setTotalOutcomeLabel(totalOutcome);
-            setRealMoneyLabel();
-        }
+        getOverviewNum();
+        setLabel();
     }
 
     public void displayValueForEdit(Money Obj){
@@ -267,4 +263,6 @@ public class TransactionController implements Initializable {
         transactionDescription.setText(Obj.getDescription());
         transactionDate.setValue(Obj.getDate());
     }
+
+
 }
