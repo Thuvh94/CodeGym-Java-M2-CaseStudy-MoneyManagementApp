@@ -71,22 +71,23 @@ public class Money {
         this.moneyType = moneyType;
     }
 
-    @Override
-    public String toString() {
-        return "Money{" +
-                "amount=" + amount +
-                ", isIncome=" + isIncome +
-                ", description='" + description + '\'' +
-                ", moneyType=" + moneyType +
-                ", date=" + date +
-                '}';
-    }
-
     public UUID getUuid() {
         return uuid;
     }
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    @Override
+    public String toString() {
+        return "Money{" +
+                "uuid=" + uuid +
+                ", amount=" + amount +
+                ", isIncome=" + isIncome +
+                ", description='" + description + '\'' +
+                ", moneyType=" + moneyType +
+                ", date=" + date +
+                '}';
     }
 }

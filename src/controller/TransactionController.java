@@ -4,8 +4,12 @@ import iservice.MoneyTypeManagement;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.MoneyType;
@@ -17,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class TransactionController implements Initializable {
     //  all transaction components
@@ -62,7 +67,6 @@ public class TransactionController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
-
     }
 
 
@@ -106,34 +110,33 @@ public class TransactionController implements Initializable {
     public void saveTransaction(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
         Money inputMoneyObj = getInputMoneyObj();
         transactionList.add(inputMoneyObj);
-        setTotalIncomeLabel(String.valueOf(totalIncome));
-        setTotalOutcomeLabel(String.valueOf(totalOutcome));
+        setTotalIncomeLabel(totalIncome);
+        setTotalOutcomeLabel(totalOutcome);
         setRealMoneyLabel();
         addTransactionToTable(transactionList);
-        System.out.println(transactionList);
         clearInputFields();
+        System.out.println(transactionList);
     }
 
     public Money getInputMoneyObj() {
-        Money inputMoneyObj = new Money();
+        Money inputMoneyObj;
+        UUID uuid = UUID.randomUUID();
         long inputAmount = Long.parseLong(amountText.getText());
-        inputMoneyObj.setAmount(inputAmount);
-
+        boolean isIncome = true;
         if (incomeRadioBtn.isSelected() && transactionGroup.getValue() != null){
-            inputMoneyObj.setIncome(true);
+//            inputMoneyObj.setIncome(true);
+            isIncome = true;
             totalIncome+=inputAmount;
         }
 
         else if (outcomeRadioBtn.isSelected() && transactionGroup.getValue()!=null){
-            inputMoneyObj.setIncome(false);
+            isIncome = false;
             totalOutcome+=inputAmount;
         }
         MoneyType moneyType = (MoneyType) transactionGroup.getValue();
-        inputMoneyObj.setMoneyType(moneyType);
         String inputDescription = transactionDescription.getText();
-        inputMoneyObj.setDescription(inputDescription);
         LocalDate inputDate = transactionDate.getValue();
-        inputMoneyObj.setDate(inputDate);
+        inputMoneyObj = new Money(uuid,inputAmount,isIncome,inputDescription,moneyType,inputDate);
         return inputMoneyObj;
     }
 
@@ -155,41 +158,17 @@ public class TransactionController implements Initializable {
         allTransactionTable.setItems(list);
     }
 
-    //Get total income and outcome and display in label
-//    private void setOverViewLabel(Money moneyObj){
-//        if(moneyObj.isIncome()){
-//            setTotalIncomeLabel();
-//            setRealMoneyLabel();
-//        }
-//        else {
-//            setTotalOutcomeLabel();
-//            setRealMoneyLabel();
-//        }
-//    }
-    public long getTotalIncome(){
-        totalIncome += getInputMoneyObj().getAmount();
-        return totalIncome;
-    }
-
-//    public long getTotalOutcome(){
-//        totalOutcome += getInputMoneyObj().getAmount();
-//        return totalOutcome;
-//    }
-//    public long getRealMoney(){
-//        return (totalIncome - totalOutcome);
-//    }
-
-    private void setTotalIncomeLabel(String s){
+    private void setTotalIncomeLabel(long number){
         totalIncomeLabel.setText(String.valueOf(totalIncome));
     }
-    private void setTotalOutcomeLabel(String s){
+    private void setTotalOutcomeLabel(long number){
         totalOutcomeLabel.setText(String.valueOf(totalOutcome));
     }
     private void setRealMoneyLabel(){
         realMoneyLabel.setText(String.valueOf(totalIncome - totalOutcome));
     }
 
-    // get selected item in table row
+    // Action when user tap a cell in table
         public void confirmUserAction(){
         Money selectedMoney = allTransactionTable.getSelectionModel().getSelectedItem();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -233,21 +212,47 @@ public class TransactionController implements Initializable {
 
     public void editActionSelected(Money Obj){
         displayValueForEdit(Obj);
-        int index = transactionList.indexOf(Obj);
+        System.out.println("old" + Obj);
+        saveTransactionBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                editTransaction(Obj);
+                addTransactionToTable(transactionList);
+                allTransactionTable.refresh();
+                System.out.println("list" + transactionList);
+            }
+        });
+//        int index = transactionList.indexOf(Obj);
         // code edit
     }
+
+    public void editTransaction(Money Obj){
+        Obj.setAmount(Long.parseLong(amountText.getText()));
+        Obj.setMoneyType((MoneyType) transactionGroup.getValue());
+        Obj.setDescription(transactionDescription.getText());
+        Obj.setDate(transactionDate.getValue());
+        boolean isIncome = true;
+        if (incomeRadioBtn.isSelected() && transactionGroup.getValue() != null) {
+            isIncome = true;
+        } else if (outcomeRadioBtn.isSelected() && transactionGroup.getValue() != null) {
+            isIncome = false;
+        }
+        Obj.setIncome(isIncome);
+        System.out.println("new obj"+ Obj);
+    }
+
     public void deleteActionSelected(Money Obj){
         System.out.println("Delete");
         transactionList.remove(Obj);
         addTransactionToTable(transactionList);
         if(Obj.isIncome()){
             totalIncome = totalIncome - Obj.getAmount();
-            setTotalIncomeLabel(String.valueOf(totalIncome));
+            setTotalIncomeLabel(totalIncome);
             setRealMoneyLabel();
         }
         else{
             totalOutcome = totalOutcome - Obj.getAmount();
-            setTotalOutcomeLabel(String.valueOf(totalOutcome));
+            setTotalOutcomeLabel(totalOutcome);
             setRealMoneyLabel();
         }
     }
