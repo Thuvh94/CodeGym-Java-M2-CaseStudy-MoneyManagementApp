@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.MoneyType;
@@ -67,6 +64,18 @@ public class TransactionController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
+        amountText.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")){
+                amountText.setText(newValue.replaceAll("[^\\d]",""));
+            }
+        });
+        transactionDate.setDayCellFactory(param -> new DateCell() {
+                @Override
+                public void updateItem(LocalDate date, boolean empty) {
+                    super.updateItem(date, empty);
+                    setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+                }
+            });
     }
 
 
@@ -254,15 +263,13 @@ public class TransactionController implements Initializable {
     }
 
     public void displayValueForEdit(Money Obj){
+        transactionGroup.setValue(Obj.getMoneyType());
         amountText.setText(String.valueOf(Obj.getAmount()));
         if(Obj.isIncome())
             incomeRadioBtn.setSelected(true);
         else
             outcomeRadioBtn.setSelected(true);
-        transactionGroup.setValue(Obj.getMoneyType());
         transactionDescription.setText(Obj.getDescription());
         transactionDate.setValue(Obj.getDate());
     }
-
-
 }
