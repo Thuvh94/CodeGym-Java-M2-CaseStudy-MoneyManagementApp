@@ -6,8 +6,7 @@ public class Money {
     private long amount;
     private boolean isIncome;
     private String description;
-//    private String incomeType;
-//    private String outcomeType;
+    private MoneyType moneyType;
     private LocalDate date;
 
     public Money() {
@@ -17,6 +16,14 @@ public class Money {
         this.amount = amount;
         this.isIncome = isIncome;
         this.description = description;
+        this.date = date;
+    }
+
+    public Money(long amount, boolean isIncome, String description, MoneyType moneyType, LocalDate date) {
+        this.amount = amount;
+        this.isIncome = isIncome;
+        this.description = description;
+        this.moneyType = moneyType;
         this.date = date;
     }
 
@@ -52,6 +59,13 @@ public class Money {
         this.date = date;
     }
 
+    public MoneyType getMoneyType() {
+        return moneyType;
+    }
+
+    public void setMoneyType(MoneyType moneyType) {
+        this.moneyType = moneyType;
+    }
 
     @Override
     public String toString() {
@@ -59,24 +73,8 @@ public class Money {
                 "amount=" + amount +
                 ", isIncome=" + isIncome +
                 ", description='" + description + '\'' +
+                ", moneyType=" + moneyType +
                 ", date=" + date +
                 '}';
     }
-
-    //    public String getIncomeType() {
-//        return incomeType;
-//    }
-//
-//    public void setIncomeType(String incomeType) {
-//        this.incomeType = incomeType;
-//    }
-//
-//    public String getOutcomeType() {
-//        return outcomeType;
-//    }
-//
-//    public void setOutcomeType(String outcomeType) {
-//        this.outcomeType = outcomeType;
-//    }
-
 }

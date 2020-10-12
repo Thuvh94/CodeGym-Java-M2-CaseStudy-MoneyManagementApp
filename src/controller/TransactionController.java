@@ -1,7 +1,6 @@
 package controller;
 
-import iservice.IncomeTypeManage;
-import iservice.OutcomeTypeManage;
+import iservice.MoneyTypeManagement;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,10 +8,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
-import model.IncomeType;
+import model.MoneyType;
 import model.Money;
-import model.OutcomeType;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,6 +26,8 @@ public class TransactionController implements Initializable {
     private TableColumn<Money, LocalDate> transactionDateColumn;
     @FXML
     private TableColumn<Money, Long> transactionAmountColumn;
+    @FXML
+    private TableColumn<Money, MoneyType> transactionMoneyTypeColumn;
     @FXML
     private TableColumn<Money, String> transactionDetailColumn;
     @FXML
@@ -62,7 +61,10 @@ public class TransactionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
+
     }
+
 
     // Validate amount text field
     public void validateAmountTextField() {
@@ -82,7 +84,7 @@ public class TransactionController implements Initializable {
         // Khi chọn income thì các chi tiêu trong phần loại sẽ khác với outcome
         System.out.println("User choose income transaction");
         transactionGroup.getItems().clear();
-        List<IncomeType> incomeTypes = new IncomeTypeManage().findAll();
+        List<MoneyType> incomeTypes = new MoneyTypeManagement().findIncomeTypeList();
         for (int i = 0; i < incomeTypes.size(); i++) {
             transactionGroup.getItems().add(incomeTypes.get(i));
         }
@@ -93,17 +95,22 @@ public class TransactionController implements Initializable {
         // Khi chọn outcome thì các chi tiêu trong phần loại sẽ khác với income
         System.out.println("User choose outcome transaction");
         transactionGroup.getItems().clear();
-        List<OutcomeType> outcomeTypes = new OutcomeTypeManage().findAll();
+        List<MoneyType> outcomeTypes = new MoneyTypeManagement().findOutcomeTypeList();
         for (int i = 0; i < outcomeTypes.size(); i++) {
             transactionGroup.getItems().add(outcomeTypes.get(i));
         }
     }
 
+
     // Save button
     public void saveTransaction(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
         Money inputMoneyObj = getInputMoneyObj();
         transactionList.add(inputMoneyObj);
-        setOverViewLabel(inputMoneyObj);
+        if(inputMoneyObj.isIncome())
+            setTotalIncomeLabel();
+        else
+            setTotalOutcomeLabel();
+        setRealMoneyLabel();
         addTransactionToTable(transactionList);
         System.out.println(transactionList);
         clearInputFields();
@@ -117,9 +124,10 @@ public class TransactionController implements Initializable {
         else if (outcomeRadioBtn.isSelected() && transactionGroup.getValue() != null) {
             isIncome = false;
         }
+        MoneyType moneyType = (MoneyType) transactionGroup.getValue();
         String inputDescription = transactionDescription.getText();
         LocalDate inputDate = transactionDate.getValue();
-        Money inputMoneyObj = new Money(inputAmount, isIncome, inputDescription, inputDate);
+        Money inputMoneyObj = new Money(inputAmount, isIncome, inputDescription, moneyType, inputDate);
         return inputMoneyObj;
     }
 
@@ -136,21 +144,22 @@ public class TransactionController implements Initializable {
     public void addTransactionToTable(ObservableList<Money> list){
         transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         transactionDetailColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        transactionMoneyTypeColumn.setCellValueFactory(new PropertyValueFactory<>("moneyType"));
         transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         allTransactionTable.setItems(list);
     }
 
      //Get total income and outcome and display in label
-    private void setOverViewLabel(Money moneyObj){
-        if(moneyObj.isIncome()){
-            setTotalIncomeLabel();
-            setRealMoneyLabel();
-        }
-        else {
-            setTotalOutcomeLabel();
-            setRealMoneyLabel();
-        }
-    }
+//    private void setOverViewLabel(Money moneyObj){
+//        if(moneyObj.isIncome()){
+//            setTotalIncomeLabel();
+//            setRealMoneyLabel();
+//        }
+//        else {
+//            setTotalOutcomeLabel();
+//            setRealMoneyLabel();
+//        }
+//    }
     public long getTotalIncome(){
         totalIncome += getInputMoneyObj().getAmount();
         return totalIncome;
@@ -199,7 +208,7 @@ public class TransactionController implements Initializable {
 
     public void editActionSelected(Money Obj){
         displayValueForEdit(Obj);
-
+        int index = transactionList.indexOf(Obj);
     }
     public void deleteActionSelected(Money Obj){
         System.out.println("Delete");
@@ -213,7 +222,9 @@ public class TransactionController implements Initializable {
             incomeRadioBtn.setSelected(true);
         else
             outcomeRadioBtn.setSelected(true);
+        transactionGroup.setValue(Obj.getMoneyType());
         transactionDescription.setText(Obj.getDescription());
         transactionDate.setValue(Obj.getDate());
+
     }
 }
