@@ -1,6 +1,8 @@
 package model;
 
-public class MoneyType {
+import java.io.Serializable;
+
+public class MoneyType implements Serializable {
     private int id;
     private boolean isIncomeType;
     private String name;

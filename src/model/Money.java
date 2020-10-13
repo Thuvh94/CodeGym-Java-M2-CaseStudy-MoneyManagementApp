@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class Money {
+public class Money implements Serializable {
     private UUID uuid;
     private long amount;
     private boolean isIncome;

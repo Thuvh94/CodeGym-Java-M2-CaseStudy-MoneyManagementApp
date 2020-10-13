@@ -12,13 +12,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import model.MoneyType;
 import model.Money;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 public class TransactionController implements Initializable {
     //  all transaction components
@@ -57,25 +54,35 @@ public class TransactionController implements Initializable {
     @FXML
     private DatePicker transactionDate;
 
-    public static ObservableList<Money> transactionList = FXCollections.observableArrayList();
+    private static ObservableList<Money> transactionList;
     private long totalIncome = 0;
     private long totalOutcome = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
+        transactionList = FXCollections.observableArrayList(readFile());
+        if (transactionList.size() == 0)
+            allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
+        else{
+            addTransactionToTable(transactionList);
+            allTransactionTable.refresh();
+        }
         amountText.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")){
-                amountText.setText(newValue.replaceAll("[^\\d]",""));
+            if (!newValue.matches("\\d*")) {
+                amountText.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
+
+        // disable future date in datepicker
         transactionDate.setDayCellFactory(param -> new DateCell() {
-                @Override
-                public void updateItem(LocalDate date, boolean empty) {
-                    super.updateItem(date, empty);
-                    setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
-                }
-            });
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.compareTo(LocalDate.now()) > 0);
+            }
+        });
+        getOverviewNum();
+        setLabel();
     }
 
 
@@ -129,17 +136,15 @@ public class TransactionController implements Initializable {
         UUID uuid = UUID.randomUUID();
         long inputAmount = Long.parseLong(amountText.getText());
         boolean isIncome = true;
-        if (incomeRadioBtn.isSelected() && transactionGroup.getValue() != null){
+        if (incomeRadioBtn.isSelected() && transactionGroup.getValue() != null) {
             isIncome = true;
-        }
-
-        else if (outcomeRadioBtn.isSelected() && transactionGroup.getValue()!=null){
+        } else if (outcomeRadioBtn.isSelected() && transactionGroup.getValue() != null) {
             isIncome = false;
         }
         MoneyType moneyType = (MoneyType) transactionGroup.getValue();
         String inputDescription = transactionDescription.getText();
         LocalDate inputDate = transactionDate.getValue();
-        inputMoneyObj = new Money(uuid,inputAmount,isIncome,inputDescription,moneyType,inputDate);
+        inputMoneyObj = new Money(uuid, inputAmount, isIncome, inputDescription, moneyType, inputDate);
         return inputMoneyObj;
     }
 
@@ -153,33 +158,35 @@ public class TransactionController implements Initializable {
     }
 
     // Add transactions to table
-    public void addTransactionToTable(ObservableList<Money> list){
+    public void addTransactionToTable(ObservableList<Money> list) {
         transactionDateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         transactionDetailColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         transactionMoneyTypeColumn.setCellValueFactory(new PropertyValueFactory<>("moneyType"));
         transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         allTransactionTable.setItems(list);
     }
-    private void getOverviewNum(){
+
+    private void getOverviewNum() {
         long income = 0;
         long outcome = 0;
         for (int i = 0; i < transactionList.size(); i++) {
-            if(transactionList.get(i).isIncome())
-                income+=transactionList.get(i).getAmount();
+            if (transactionList.get(i).isIncome())
+                income += transactionList.get(i).getAmount();
             else
-               outcome +=transactionList.get(i).getAmount();
+                outcome += transactionList.get(i).getAmount();
         }
         totalIncome = income;
         totalOutcome = outcome;
     }
-    private void setLabel(){
+
+    private void setLabel() {
         totalIncomeLabel.setText(String.valueOf(totalIncome));
         totalOutcomeLabel.setText(String.valueOf(totalOutcome));
         realMoneyLabel.setText(String.valueOf(totalIncome - totalOutcome));
     }
 
     // Action when user tap a cell in table
-        public void confirmUserAction(){
+    public void confirmUserAction() {
         Money selectedMoney = allTransactionTable.getSelectionModel().getSelectedItem();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
@@ -193,7 +200,7 @@ public class TransactionController implements Initializable {
         alert.getButtonTypes().setAll(buttonEdit, buttonDelete, buttonCancel);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonEdit){
+        if (result.get() == buttonEdit) {
             editActionSelected(selectedMoney);
         } else if (result.get() == buttonDelete) {
             confirmDeleteDialog(selectedMoney);
@@ -202,7 +209,7 @@ public class TransactionController implements Initializable {
         }
     }
 
-    public void confirmDeleteDialog(Money money){
+    public void confirmDeleteDialog(Money money) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
         alert.setHeaderText(null);
@@ -214,7 +221,7 @@ public class TransactionController implements Initializable {
         alert.getButtonTypes().setAll(buttonYes, buttonCancel);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonYes){
+        if (result.get() == buttonYes) {
             deleteActionSelected(money);
         } else {
             alert.close();
@@ -222,7 +229,7 @@ public class TransactionController implements Initializable {
     }
 
 
-    public void editActionSelected(Money Obj){
+    public void editActionSelected(Money Obj) {
         displayValueForEdit(Obj);
         System.out.println("old" + Obj);
         saveTransactionBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -237,9 +244,10 @@ public class TransactionController implements Initializable {
                 setLabel();
             }
         });
+
     }
 
-    public void editTransaction(Money Obj){
+    public void editTransaction(Money Obj) {
         Obj.setAmount(Long.parseLong(amountText.getText()));
         Obj.setMoneyType((MoneyType) transactionGroup.getValue());
         Obj.setDescription(transactionDescription.getText());
@@ -251,10 +259,10 @@ public class TransactionController implements Initializable {
             isIncome = false;
         }
         Obj.setIncome(isIncome);
-        System.out.println("new obj"+ Obj);
+        System.out.println("new obj" + Obj);
     }
 
-    public void deleteActionSelected(Money Obj){
+    public void deleteActionSelected(Money Obj) {
         System.out.println("Delete");
         transactionList.remove(Obj);
         addTransactionToTable(transactionList);
@@ -262,14 +270,49 @@ public class TransactionController implements Initializable {
         setLabel();
     }
 
-    public void displayValueForEdit(Money Obj){
+    public void displayValueForEdit(Money Obj) {
         transactionGroup.setValue(Obj.getMoneyType());
         amountText.setText(String.valueOf(Obj.getAmount()));
-        if(Obj.isIncome())
+        if (Obj.isIncome())
             incomeRadioBtn.setSelected(true);
         else
             outcomeRadioBtn.setSelected(true);
         transactionDescription.setText(Obj.getDescription());
         transactionDate.setValue(Obj.getDate());
     }
+
+     //readFile and writeFile
+    public void writeFile() {
+        try {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("transaction.dat"));
+            for (Money money : transactionList) {
+                objectOutputStream.writeObject(money);
+            }
+            objectOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("bye bye");
+
+    }
+
+    public List<Money> readFile() {
+        List<Money> list = new ArrayList<>();
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("transaction.dat"));
+
+            while (true) {
+                list.add((Money) objectInputStream.readObject());
+            }
+        } catch (EOFException e) {
+            e.getMessage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
+
+
