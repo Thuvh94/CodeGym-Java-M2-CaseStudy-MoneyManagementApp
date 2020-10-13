@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
@@ -38,6 +39,8 @@ public class TransactionController implements Initializable {
     private Label totalOutcomeLabel;
     @FXML
     private Label realMoneyLabel;
+    @FXML
+    private Button resetBtn;
 
     // edit transaction components
     @FXML
@@ -66,6 +69,14 @@ public class TransactionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //...
+        //firstNameCol.setSortType(TableColumn.SortType.ASCENDING);
+        //...
+        //tableView.setItems(data);
+        //tableView.getColumns().addAll(firstNameCol, lastNameCol, emailCol, ageCol);
+        //tableView.getSortOrder().add(firstNameCol);
+        //...
+        transactionDateColumn.setSortType(TableColumn.SortType.DESCENDING);
         transactionList = FXCollections.observableArrayList(readFile());
         if (transactionList.size() == 0)
             allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
@@ -234,9 +245,11 @@ public class TransactionController implements Initializable {
             alert.close();
         }
     }
-    public void getSelectedItem(){
-        selectedTableTransaction = allTransactionTable.getSelectionModel().getSelectedItem();
-        confirmUserAction(selectedTableTransaction);
+    public void getSelectedItem(MouseEvent click){
+        if (click.getClickCount() == 2){
+            selectedTableTransaction = allTransactionTable.getSelectionModel().getSelectedItem();
+            confirmUserAction(selectedTableTransaction);
+        }
     }
 
     public void confirmDeleteDialog(Money money) {
@@ -359,6 +372,27 @@ public class TransactionController implements Initializable {
 //                    };
 //                };
 //            };
+    }
+
+    //reset all
+    public void confirmReset(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Xác nhận thao tác");
+        alert.setHeaderText(null);
+        alert.setContentText("Bạn có chắc chắn muốn thực hiện thao tác này?\n Mọi giao dịch của bạn sẽ bị xóa và không thể khôi phục.");
+
+        ButtonType buttonYes = new ButtonType("Đồng ý");
+        ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonYes, buttonCancel);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonYes) {
+            transactionList.clear();
+            saveTransactionToTable();
+        } else {
+            alert.close();
+        }
     }
 }
 
