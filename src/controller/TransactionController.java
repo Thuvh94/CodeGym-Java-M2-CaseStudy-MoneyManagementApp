@@ -1,6 +1,8 @@
 package controller;
 
 import iservice.MoneyTypeManagement;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -65,26 +67,17 @@ public class TransactionController implements Initializable {
     private TextField hiddenUUID;
 
     private static ObservableList<Money> transactionList;
-    private static ObservableList<Money> onlyIncomeList;
-    private static ObservableList<Money> onlyOutcomeList;
     private long totalIncome = 0;
     private long totalOutcome = 0;
     private Money selectedTableTransaction;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //...
-        //firstNameCol.setSortType(TableColumn.SortType.ASCENDING);
-        //...
-        //tableView.setItems(data);
-        //tableView.getColumns().addAll(firstNameCol, lastNameCol, emailCol, ageCol);
-        //tableView.getSortOrder().add(firstNameCol);
-        //...
         transactionDateColumn.setSortType(TableColumn.SortType.DESCENDING);
         transactionList = FXCollections.observableArrayList(readFile());
         if (transactionList.size() == 0)
             allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
-        else{
+        else {
             addTransactionToTable(transactionList);
             allTransactionTable.refresh();
         }
@@ -145,18 +138,19 @@ public class TransactionController implements Initializable {
 
     // Save button
     public void saveTransaction(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
-        if(hiddenUUID.getText().trim().isEmpty()){
+        if (hiddenUUID.getText().trim().isEmpty()) {
             Money money = getInputMoneyObj();
             generateUUID(money);
             transactionList.add(money);
-        }
-        else{
+        } else {
             updateTransaction();
         }
         saveTransactionToTable();
+        sortChoiceBox.setValue("Tất cả");
 
     }
-    public void generateUUID(Money money){
+
+    public void generateUUID(Money money) {
         UUID uuid = UUID.randomUUID();
         money.setUuid(uuid);
     }
@@ -166,7 +160,8 @@ public class TransactionController implements Initializable {
         editTransaction(money);
         saveTransactionToTable();
     }
-    public void saveTransactionToTable(){
+
+    public void saveTransactionToTable() {
         addTransactionToTable(transactionList);
         allTransactionTable.refresh();
         clearInputFields();
@@ -251,8 +246,9 @@ public class TransactionController implements Initializable {
             alert.close();
         }
     }
-    public void getSelectedItem(MouseEvent click){
-        if (click.getClickCount() == 2){
+
+    public void getSelectedItem(MouseEvent click) {
+        if (click.getClickCount() == 2) {
             selectedTableTransaction = allTransactionTable.getSelectionModel().getSelectedItem();
             confirmUserAction(selectedTableTransaction);
         }
@@ -319,7 +315,7 @@ public class TransactionController implements Initializable {
         transactionDate.setValue(Obj.getDate());
     }
 
-     //readFile and writeFile
+    //readFile and writeFile
     public void writeFile() {
         try {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream("transaction.dat"));
@@ -353,8 +349,8 @@ public class TransactionController implements Initializable {
     }
 
     // set font color for table
-    public void setColorFont(Money Obj){
-        transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<Money,Long>("amount"));
+    public void setColorFont(Money Obj) {
+        transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<Money, Long>("amount"));
 
         // ** The TableCell class has the method setTextFill(Paint p) that you
         // ** need to override the text color
@@ -382,7 +378,7 @@ public class TransactionController implements Initializable {
     }
 
     //reset all
-    public void confirmReset(){
+    public void confirmReset() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
         alert.setHeaderText(null);
@@ -402,8 +398,8 @@ public class TransactionController implements Initializable {
         }
     }
 
-    // set options for combobox sort
-    public void setOptionSortChoiceBox(){
+    // code for choice box
+    public void setOptionSortChoiceBox() {
         ObservableList<String> options =
                 FXCollections.observableArrayList(
                         "Tất cả",
@@ -411,8 +407,36 @@ public class TransactionController implements Initializable {
                         "Chi tiêu"
                 );
         sortChoiceBox.setItems(options);
+        sortChoiceBox.getSelectionModel().selectedIndexProperty().addListener((v, oldValue, newValue) -> sortChoiceboxSelected((Integer) newValue));
     }
 
+    public ObservableList<Money> getOnlyIncomeList() {
+        ObservableList<Money> onlyIncomeList = FXCollections.observableArrayList();
+        for (int i = 0; i < transactionList.size(); i++) {
+            if (transactionList.get(i).isIncome())
+                onlyIncomeList.add(transactionList.get(i));
+        }
+        return onlyIncomeList;
+    }
+
+    public ObservableList<Money> getOnlyOutcomeList() {
+        ObservableList<Money> onlyOutcomeList = FXCollections.observableArrayList();
+        for (int i = 0; i < transactionList.size(); i++) {
+            if (!transactionList.get(i).isIncome())
+                onlyOutcomeList.add(transactionList.get(i));
+        }
+        return onlyOutcomeList;
+    }
+
+    public void sortChoiceboxSelected(int number) {
+        if (number == 0)
+            addTransactionToTable(transactionList);
+        else if (number == 1)
+            addTransactionToTable(getOnlyIncomeList());
+        else
+            addTransactionToTable(getOnlyOutcomeList());
+        allTransactionTable.refresh();
+    }
 }
 
 
