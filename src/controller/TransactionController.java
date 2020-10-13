@@ -41,6 +41,8 @@ public class TransactionController implements Initializable {
     private Label realMoneyLabel;
     @FXML
     private Button resetBtn;
+    @FXML
+    private ComboBox sortComboBox;
 
     // edit transaction components
     @FXML
@@ -63,6 +65,8 @@ public class TransactionController implements Initializable {
     private TextField hiddenUUID;
 
     private static ObservableList<Money> transactionList;
+    private static ObservableList<Money> onlyIncomeList;
+    private static ObservableList<Money> onlyOutcomeList;
     private long totalIncome = 0;
     private long totalOutcome = 0;
     private Money selectedTableTransaction;
@@ -100,6 +104,7 @@ public class TransactionController implements Initializable {
         });
         getOverviewNum();
         setLabel();
+        setOptionSortComboBox();
     }
 
 
@@ -302,6 +307,7 @@ public class TransactionController implements Initializable {
 
     public void displayValueForEdit(Money Obj) {
         hiddenUUID.setText(Obj.getUuid());
+        System.out.println(Obj.getMoneyType().toString());
         transactionGroup.setValue(Obj.getMoneyType());
         amountText.setText(String.valueOf(Obj.getAmount()));
         if (Obj.isIncome())
@@ -394,6 +400,18 @@ public class TransactionController implements Initializable {
             alert.close();
         }
     }
+
+    // set options for combobox sort
+    public void setOptionSortComboBox(){
+        ObservableList<String> options =
+                FXCollections.observableArrayList(
+                        "Tất cả",
+                        "Thu nhập",
+                        "Chi tiêu"
+                );
+        sortComboBox.setItems(options);
+    }
+
 }
 
 
