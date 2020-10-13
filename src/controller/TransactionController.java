@@ -42,7 +42,7 @@ public class TransactionController implements Initializable {
     @FXML
     private Button resetBtn;
     @FXML
-    private ComboBox sortComboBox;
+    private ChoiceBox sortChoiceBox;
 
     // edit transaction components
     @FXML
@@ -104,7 +104,8 @@ public class TransactionController implements Initializable {
         });
         getOverviewNum();
         setLabel();
-        setOptionSortComboBox();
+        setOptionSortChoiceBox();
+        sortChoiceBox.setValue("Tất cả");
     }
 
 
@@ -402,14 +403,14 @@ public class TransactionController implements Initializable {
     }
 
     // set options for combobox sort
-    public void setOptionSortComboBox(){
+    public void setOptionSortChoiceBox(){
         ObservableList<String> options =
                 FXCollections.observableArrayList(
                         "Tất cả",
                         "Thu nhập",
                         "Chi tiêu"
                 );
-        sortComboBox.setItems(options);
+        sortChoiceBox.setItems(options);
     }
 
 }
