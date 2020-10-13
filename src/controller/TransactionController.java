@@ -131,21 +131,13 @@ public class TransactionController implements Initializable {
         if(hiddenUUID.getText().trim().isEmpty()){
             Money money = getInputMoneyObj();
             generateUUID(money);
-            saveTransaction(money);
+            transactionList.add(money);
         }
         else{
             updateTransaction();
         }
+        saveTransactionToTable();
 
-    }
-    public void saveTransaction(Money inputMoneyObj){
-        transactionList.add(inputMoneyObj);
-        addTransactionToTable(transactionList);
-        allTransactionTable.refresh();
-        clearInputFields();
-        System.out.println(transactionList);
-        getOverviewNum();
-        setLabel();
     }
     public void generateUUID(Money money){
         UUID uuid = UUID.randomUUID();
@@ -155,10 +147,13 @@ public class TransactionController implements Initializable {
     public void updateTransaction() {
         Money money = selectedTableTransaction;
         editTransaction(money);
+        saveTransactionToTable();
+    }
+    public void saveTransactionToTable(){
         addTransactionToTable(transactionList);
         allTransactionTable.refresh();
-        System.out.println("list" + transactionList);
         clearInputFields();
+        System.out.println(transactionList);
         getOverviewNum();
         setLabel();
     }
