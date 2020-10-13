@@ -76,12 +76,12 @@ public class TransactionController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         transactionDateColumn.setSortType(TableColumn.SortType.DESCENDING);
         transactionList = FXCollections.observableArrayList(readFile());
-        if (transactionList.size() == 0)
+//        if (transactionList.size() == 0)
             allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
-        else {
+//        else {
             addTransactionToTable(transactionList);
             allTransactionTable.refresh();
-        }
+//        }
         amountText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 amountText.setText(newValue.replaceAll("[^\\d]", ""));
@@ -164,6 +164,7 @@ public class TransactionController implements Initializable {
     }
 
     public void saveTransactionToTable() {
+        sortTransactionList();
         addTransactionToTable(transactionList);
         allTransactionTable.refresh();
         clearInputFields();
@@ -431,8 +432,10 @@ public class TransactionController implements Initializable {
     }
 
     public void sortChoiceboxSelected(int number) {
-        if (number == 0)
+        if (number == 0){
+            sortTransactionList();
             addTransactionToTable(transactionList);
+        }
         else if (number == 1)
             addTransactionToTable(getOnlyIncomeList());
         else
@@ -440,13 +443,34 @@ public class TransactionController implements Initializable {
         allTransactionTable.refresh();
     }
 
-    // Code for check required field
+    // Code for check required field and enable save button
     public void checkRequiredFields(){
         saveTransactionBtn.disableProperty().bind(
                 amountText.textProperty().isEmpty()
                         .or( transactionGroup.valueProperty().isNull() )
                         .or( transactionDate.valueProperty().isNull() ) );
     }
+
+    //
+//   public ObservableList<Money> getSortedTransactionList(){
+//        ObservableList<Money> observableList = FXCollections.observableArrayList();
+//        observableList = transactionList;
+//        Collections.sort(observableList, new Comparator<Money>() {
+//            @Override
+//            public int compare(Money o1, Money o2) {
+//                return (o1.getDate().isAfter(o2.getDate())? 1: -1);
+//            }
+//        });
+//        return observableList;
+//   }
+       public void sortTransactionList(){
+        Collections.sort(transactionList, new Comparator<Money>() {
+            @Override
+            public int compare(Money o1, Money o2) {
+                return (o1.getDate().isBefore(o2.getDate())? 1: -1);
+            }
+        });
+   }
 }
 
 
