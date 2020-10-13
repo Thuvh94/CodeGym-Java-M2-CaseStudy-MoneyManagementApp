@@ -1,6 +1,7 @@
 package controller;
 
 import iservice.MoneyTypeManagement;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -98,7 +99,8 @@ public class TransactionController implements Initializable {
         getOverviewNum();
         setLabel();
         setOptionSortChoiceBox();
-        sortChoiceBox.setValue("Tất cả");
+        sortChoiceBox.setValue("Tất cả giao dịch");
+        checkRequiredFields();
     }
 
 
@@ -137,7 +139,7 @@ public class TransactionController implements Initializable {
 
 
     // Save button
-    public void saveTransaction(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
+    public void saveTransaction(ActionEvent actionEvent)  {
         if (hiddenUUID.getText().trim().isEmpty()) {
             Money money = getInputMoneyObj();
             generateUUID(money);
@@ -146,7 +148,7 @@ public class TransactionController implements Initializable {
             updateTransaction();
         }
         saveTransactionToTable();
-        sortChoiceBox.setValue("Tất cả");
+        sortChoiceBox.setValue("Tất cả giao dịch");
 
     }
 
@@ -402,7 +404,7 @@ public class TransactionController implements Initializable {
     public void setOptionSortChoiceBox() {
         ObservableList<String> options =
                 FXCollections.observableArrayList(
-                        "Tất cả",
+                        "Tất cả giao dịch",
                         "Thu nhập",
                         "Chi tiêu"
                 );
@@ -436,6 +438,14 @@ public class TransactionController implements Initializable {
         else
             addTransactionToTable(getOnlyOutcomeList());
         allTransactionTable.refresh();
+    }
+
+    // Code for check required field
+    public void checkRequiredFields(){
+        saveTransactionBtn.disableProperty().bind(
+                amountText.textProperty().isEmpty()
+                        .or( transactionGroup.valueProperty().isNull() )
+                        .or( transactionDate.valueProperty().isNull() ) );
     }
 }
 
