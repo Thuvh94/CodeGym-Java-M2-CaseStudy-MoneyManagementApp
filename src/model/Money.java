@@ -72,8 +72,8 @@ public class Money implements Serializable {
         this.moneyType = moneyType;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public String getUuid() {
+        return String.valueOf(uuid);
     }
 
     public void setUuid(UUID uuid) {

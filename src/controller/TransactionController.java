@@ -9,6 +9,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.util.Callback;
 import model.MoneyType;
 import model.Money;
 
@@ -53,10 +56,13 @@ public class TransactionController implements Initializable {
     private TextField transactionDescription;
     @FXML
     private DatePicker transactionDate;
+    @FXML
+    private TextField hiddenUUID;
 
     private static ObservableList<Money> transactionList;
     private long totalIncome = 0;
     private long totalOutcome = 0;
+    private Money selectedTableTransaction;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -122,18 +128,43 @@ public class TransactionController implements Initializable {
 
     // Save button
     public void saveTransaction(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
-        Money inputMoneyObj = getInputMoneyObj();
+        if(hiddenUUID.getText().trim().isEmpty()){
+            Money money = getInputMoneyObj();
+            generateUUID(money);
+            saveTransaction(money);
+        }
+        else{
+            updateTransaction();
+        }
+
+    }
+    public void saveTransaction(Money inputMoneyObj){
         transactionList.add(inputMoneyObj);
         addTransactionToTable(transactionList);
+        allTransactionTable.refresh();
         clearInputFields();
         System.out.println(transactionList);
+        getOverviewNum();
+        setLabel();
+    }
+    public void generateUUID(Money money){
+        UUID uuid = UUID.randomUUID();
+        money.setUuid(uuid);
+    }
+
+    public void updateTransaction() {
+        Money money = selectedTableTransaction;
+        editTransaction(money);
+        addTransactionToTable(transactionList);
+        allTransactionTable.refresh();
+        System.out.println("list" + transactionList);
+        clearInputFields();
         getOverviewNum();
         setLabel();
     }
 
     public Money getInputMoneyObj() {
         Money inputMoneyObj;
-        UUID uuid = UUID.randomUUID();
         long inputAmount = Long.parseLong(amountText.getText());
         boolean isIncome = true;
         if (incomeRadioBtn.isSelected() && transactionGroup.getValue() != null) {
@@ -144,7 +175,7 @@ public class TransactionController implements Initializable {
         MoneyType moneyType = (MoneyType) transactionGroup.getValue();
         String inputDescription = transactionDescription.getText();
         LocalDate inputDate = transactionDate.getValue();
-        inputMoneyObj = new Money(uuid, inputAmount, isIncome, inputDescription, moneyType, inputDate);
+        inputMoneyObj = new Money(inputAmount, isIncome, inputDescription, moneyType, inputDate);
         return inputMoneyObj;
     }
 
@@ -155,6 +186,7 @@ public class TransactionController implements Initializable {
         transactionGroup.getItems().clear();
         outcomeRadioBtn.setSelected(false);
         incomeRadioBtn.setSelected(false);
+        hiddenUUID.clear();
     }
 
     // Add transactions to table
@@ -186,8 +218,7 @@ public class TransactionController implements Initializable {
     }
 
     // Action when user tap a cell in table
-    public void confirmUserAction() {
-        Money selectedMoney = allTransactionTable.getSelectionModel().getSelectedItem();
+    public void confirmUserAction(Money selectedMoney) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Xác nhận thao tác");
         alert.setHeaderText(null);
@@ -207,6 +238,10 @@ public class TransactionController implements Initializable {
         } else {
             alert.close();
         }
+    }
+    public void getSelectedItem(){
+        selectedTableTransaction = allTransactionTable.getSelectionModel().getSelectedItem();
+        confirmUserAction(selectedTableTransaction);
     }
 
     public void confirmDeleteDialog(Money money) {
@@ -232,19 +267,6 @@ public class TransactionController implements Initializable {
     public void editActionSelected(Money Obj) {
         displayValueForEdit(Obj);
         System.out.println("old" + Obj);
-        saveTransactionBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                editTransaction(Obj);
-                addTransactionToTable(transactionList);
-                allTransactionTable.refresh();
-                System.out.println("list" + transactionList);
-                clearInputFields();
-                getOverviewNum();
-                setLabel();
-            }
-        });
-
     }
 
     public void editTransaction(Money Obj) {
@@ -271,6 +293,7 @@ public class TransactionController implements Initializable {
     }
 
     public void displayValueForEdit(Money Obj) {
+        hiddenUUID.setText(Obj.getUuid());
         transactionGroup.setValue(Obj.getMoneyType());
         amountText.setText(String.valueOf(Obj.getAmount()));
         if (Obj.isIncome())
@@ -312,6 +335,35 @@ public class TransactionController implements Initializable {
             e.printStackTrace();
         }
         return list;
+    }
+
+    // set font color for table
+    public void setColorFont(Money Obj){
+        transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<Money,Long>("amount"));
+
+        // ** The TableCell class has the method setTextFill(Paint p) that you
+        // ** need to override the text color
+        //   To obtain the TableCell we need to replace the Default CellFactory
+        //   with one that returns a new TableCell instance,
+        //   and @Override the updateItem(String item, boolean empty) method.
+        //
+//        transactionAmountColumn.setCellFactory(new Callback<TableColumn, TableCell>() {
+//            public TableCell call(TableColumn param) {
+//                return new TableCell<Money, String>() {
+//
+//                    @Override
+//                    public void updateItem(String item, boolean empty) {
+//                        super.updateItem(item, empty);
+//                        if (Obj.isIncome()) {
+//                            this.setTextFill(Color.BLUE);
+//                        } else{
+//                            this.setTextFill(Color.RED);
+//                        }
+//                            setText(item);
+//                        }
+//                    };
+//                };
+//            };
     }
 }
 
