@@ -5,7 +5,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TransactionController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TransactionController">
    <children>
       <TableView fx:id="allTransactionTable" layoutX="24.0" layoutY="196.0" onMouseClicked="#getSelectedItem" prefHeight="316.0" prefWidth="420.0">
         <columns>
@@ -28,16 +28,16 @@
             <Font name="System Bold" size="21.0" />
          </font>
       </Label>
-      <Label fx:id="totalIncomeLabel" alignment="CENTER_RIGHT" contentDisplay="BOTTOM" layoutX="162.0" layoutY="51.0" text="0" textAlignment="RIGHT" wrapText="true">
+      <Label fx:id="totalIncomeLabel" alignment="CENTER_RIGHT" contentDisplay="BOTTOM" layoutX="162.0" layoutY="51.0" style="-fx-alignment: Right;" text="0" textAlignment="RIGHT" wrapText="true">
          <font>
             <Font size="14.0" />
          </font></Label>
-      <Label fx:id="totalOutcomeLabel" layoutX="162.0" layoutY="75.0" text="0 " textAlignment="RIGHT" wrapText="true">
+      <Label fx:id="totalOutcomeLabel" layoutX="162.0" layoutY="75.0" onKeyPressed="#addCommaAmountTextfield" style="-fx-alignment: Right;" text="0 " textAlignment="RIGHT" wrapText="true">
          <font>
             <Font size="14.0" />
          </font></Label>
       <Line endX="234.0" layoutX="205.0" layoutY="100.0" startX="-174.0" />
-      <Label fx:id="realMoneyLabel" layoutX="162.0" layoutY="109.0" text="0" textAlignment="RIGHT" wrapText="true">
+      <Label fx:id="realMoneyLabel" layoutX="162.0" layoutY="109.0" style="-fx-alignment: Right;" text="0" textAlignment="RIGHT" wrapText="true">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>

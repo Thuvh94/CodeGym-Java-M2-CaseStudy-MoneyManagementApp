@@ -25,15 +25,14 @@ public class Main extends Application {
         primaryStage.setTitle("Transaction");
         primaryStage.setScene(new Scene(root, 850, 550));
         primaryStage.show();
+        TransactionController transactionController = new TransactionController();
+
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 TransactionController transactionController = new TransactionController();
                 transactionController.writeFile();
             }
         });
-        NumberFormat nf = NumberFormat.getInstance(new Locale("en", "US"));
-        String price = nf.format(Integer.parseInt("500000"));
-        System.out.println(price);
     }
 
 }

@@ -15,12 +15,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Callback;
 import model.MoneyType;
 import model.Money;
 
 import java.io.*;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -75,6 +77,7 @@ public class TransactionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        addCommaAmountTextfield();
         transactionDateColumn.setSortType(TableColumn.SortType.DESCENDING);
         transactionList = FXCollections.observableArrayList(readFile());
 //        if (transactionList.size() == 0)
@@ -102,10 +105,11 @@ public class TransactionController implements Initializable {
         setOptionSortChoiceBox();
         sortChoiceBox.setValue("Tất cả giao dịch");
         checkRequiredFields();
-        transactionAmountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
-        totalOutcomeLabel.setStyle("-fx-alignment: CENTER-RIGHT;");
-        totalIncomeLabel.setStyle("-fx-alignment: CENTER-RIGHT;");
-        realMoneyLabel.setStyle("-fx-alignment: CENTER-RIGHT;");
+//        totalOutcomeLabel.setTextAlignment(TextAlignment.RIGHT);
+//        totalIncomeLabel.setTextAlignment(TextAlignment.RIGHT);
+//        realMoneyLabel.setTextAlignment(TextAlignment.RIGHT);
+        setColorForTableCell();
+
     }
 
 
@@ -211,7 +215,7 @@ public class TransactionController implements Initializable {
         transactionMoneyTypeColumn.setCellValueFactory(new PropertyValueFactory<>("moneyType"));
         transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("en", "US"));
-        transactionAmountColumn.setCellFactory(tc -> new TableCell<Money,Long>() {
+        transactionAmountColumn.setCellFactory(tc -> new TableCell<Money, Long>() {
 
             @Override
             protected void updateItem(Long amount, boolean empty) {
@@ -487,6 +491,59 @@ public class TransactionController implements Initializable {
         return price;
     }
 
+    public void addCommaAmountTextfield() {
+        amountText.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            NumberFormat formatter = NumberFormat.getInstance(new Locale("en", "US"));
+            String newValueStr = formatter.format(newValue);
+            amountText.setText(newValueStr);
+        });
+    }
+
+    public void setColorForTableCell() {
+//        transactionMoneyTypeColumn.setCellFactory(column -> {
+//            return new TableCell<Money, MoneyType>() {
+//                @Override
+//                protected void updateItem(MoneyType moneyType, boolean empty) {
+//                    super.updateItem(moneyType, empty);
+//                    if (moneyType == null || empty) {
+//                        setText(null);
+//                        setStyle("");
+//                    } else {
+//                        setText(moneyType.getName());
+//                        if (moneyType.isIncomeType()) {
+//                            setTextFill(Color.BLUE);
+//                        } else {
+//                            setTextFill(Color.RED);
+//                        }
+//                    }
+//                }
+//            };
+//        });
+        allTransactionTable.setRowFactory(tv -> new TableRow<Money>() {
+            @Override
+            protected void updateItem(Money money, boolean empty) {
+                super.updateItem(money, empty);
+                if (money == null)
+                    setStyle("");
+                else{
+                    if (money.isIncome()){
+                        transactionAmountColumn.setStyle("-fx-text-fill: blue");
+                        transactionDateColumn.setStyle("-fx-text-fill: blue");
+                        transactionMoneyTypeColumn.setStyle("-fx-text-fill: blue");
+                        transactionDetailColumn.setStyle("-fx-text-fill: blue");
+                    }
+
+                    else{
+                        transactionAmountColumn.setStyle("-fx-text-fill: red");
+                        transactionDateColumn.setStyle("-fx-text-fill: red");
+                        transactionMoneyTypeColumn.setStyle("-fx-text-fill: red");
+                        transactionDetailColumn.setStyle("-fx-text-fill: red");
+                    }
+                }
+            }
+        });
+
+    }
 }
 
 
