@@ -103,6 +103,9 @@ public class TransactionController implements Initializable {
         sortChoiceBox.setValue("Tất cả giao dịch");
         checkRequiredFields();
         transactionAmountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        totalOutcomeLabel.setStyle("-fx-alignment: CENTER-RIGHT;");
+        totalIncomeLabel.setStyle("-fx-alignment: CENTER-RIGHT;");
+        realMoneyLabel.setStyle("-fx-alignment: CENTER-RIGHT;");
     }
 
 
@@ -207,6 +210,19 @@ public class TransactionController implements Initializable {
         transactionDetailColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         transactionMoneyTypeColumn.setCellValueFactory(new PropertyValueFactory<>("moneyType"));
         transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("en", "US"));
+        transactionAmountColumn.setCellFactory(tc -> new TableCell<Money,Long>() {
+
+            @Override
+            protected void updateItem(Long amount, boolean empty) {
+                super.updateItem(amount, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(currencyFormat.format(amount));
+                }
+            }
+        });
         allTransactionTable.setItems(list);
     }
 
@@ -470,6 +486,7 @@ public class TransactionController implements Initializable {
         String price = nf.format(Integer.parseInt(string));
         return price;
     }
+
 }
 
 
