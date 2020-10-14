@@ -1,28 +1,19 @@
 package controller;
 
 import iservice.MoneyTypeManagement;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.TextAlignment;
-import javafx.util.Callback;
 import model.MoneyType;
 import model.Money;
 
 import java.io.*;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -80,12 +71,9 @@ public class TransactionController implements Initializable {
         addCommaAmountTextfield();
         transactionDateColumn.setSortType(TableColumn.SortType.DESCENDING);
         transactionList = FXCollections.observableArrayList(readFile());
-//        if (transactionList.size() == 0)
         allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
-//        else {
         addTransactionToTable(transactionList);
         allTransactionTable.refresh();
-//        }
         amountText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 amountText.setText(newValue.replaceAll("[^\\d]", ""));
@@ -105,9 +93,6 @@ public class TransactionController implements Initializable {
         setOptionSortChoiceBox();
         sortChoiceBox.setValue("Tất cả giao dịch");
         checkRequiredFields();
-//        totalOutcomeLabel.setTextAlignment(TextAlignment.RIGHT);
-//        totalIncomeLabel.setTextAlignment(TextAlignment.RIGHT);
-//        realMoneyLabel.setTextAlignment(TextAlignment.RIGHT);
         setColorForTableCell();
 
     }
@@ -334,7 +319,7 @@ public class TransactionController implements Initializable {
     public void displayValueForEdit(Money Obj) {
         hiddenUUID.setText(Obj.getUuid());
         System.out.println(Obj.getMoneyType().toString());
-        transactionGroup.setValue(Obj.getMoneyType());
+        transactionGroup.setValue(Obj.getMoneyType().getName());
         amountText.setText(String.valueOf(Obj.getAmount()));
         if (Obj.isIncome())
             incomeRadioBtn.setSelected(true);
@@ -375,35 +360,6 @@ public class TransactionController implements Initializable {
             e.printStackTrace();
         }
         return list;
-    }
-
-    // set font color for table
-    public void setColorFont(Money Obj) {
-        transactionAmountColumn.setCellValueFactory(new PropertyValueFactory<Money, Long>("amount"));
-
-        // ** The TableCell class has the method setTextFill(Paint p) that you
-        // ** need to override the text color
-        //   To obtain the TableCell we need to replace the Default CellFactory
-        //   with one that returns a new TableCell instance,
-        //   and @Override the updateItem(String item, boolean empty) method.
-        //
-//        transactionAmountColumn.setCellFactory(new Callback<TableColumn, TableCell>() {
-//            public TableCell call(TableColumn param) {
-//                return new TableCell<Money, String>() {
-//
-//                    @Override
-//                    public void updateItem(String item, boolean empty) {
-//                        super.updateItem(item, empty);
-//                        if (Obj.isIncome()) {
-//                            this.setTextFill(Color.BLUE);
-//                        } else{
-//                            this.setTextFill(Color.RED);
-//                        }
-//                            setText(item);
-//                        }
-//                    };
-//                };
-//            };
     }
 
     //reset all
@@ -500,25 +456,6 @@ public class TransactionController implements Initializable {
     }
 
     public void setColorForTableCell() {
-//        transactionMoneyTypeColumn.setCellFactory(column -> {
-//            return new TableCell<Money, MoneyType>() {
-//                @Override
-//                protected void updateItem(MoneyType moneyType, boolean empty) {
-//                    super.updateItem(moneyType, empty);
-//                    if (moneyType == null || empty) {
-//                        setText(null);
-//                        setStyle("");
-//                    } else {
-//                        setText(moneyType.getName());
-//                        if (moneyType.isIncomeType()) {
-//                            setTextFill(Color.BLUE);
-//                        } else {
-//                            setTextFill(Color.RED);
-//                        }
-//                    }
-//                }
-//            };
-//        });
         allTransactionTable.setRowFactory(tv -> new TableRow<Money>() {
             @Override
             protected void updateItem(Money money, boolean empty) {

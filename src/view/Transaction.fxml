@@ -8,12 +8,12 @@
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="950.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TransactionController">
    <children>
       <TableView fx:id="allTransactionTable" layoutX="24.0" layoutY="196.0" onMouseClicked="#getSelectedItem" prefHeight="316.0" prefWidth="420.0">
-        <columns>
-          <TableColumn fx:id="transactionDateColumn" prefWidth="83.0" text="Ngày" />
-          <TableColumn fx:id="transactionMoneyTypeColumn" prefWidth="125.0" text="Mục giao dịch" />
+         <columns>
+            <TableColumn fx:id="transactionDateColumn" prefWidth="83.0" text="Ngày" />
+            <TableColumn fx:id="transactionMoneyTypeColumn" prefWidth="125.0" text="Mục giao dịch" />
             <TableColumn fx:id="transactionDetailColumn" prefWidth="117.0" text="Mô tả" />
             <TableColumn fx:id="transactionAmountColumn" prefWidth="94.0" text="Số tiền" />
-        </columns>
+         </columns>
       </TableView>
       <Label layoutX="31.0" layoutY="51.0" text="Tổng thu nhập : ">
          <font>
