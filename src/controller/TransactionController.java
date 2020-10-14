@@ -102,6 +102,7 @@ public class TransactionController implements Initializable {
         setOptionSortChoiceBox();
         sortChoiceBox.setValue("Tất cả giao dịch");
         checkRequiredFields();
+        transactionAmountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
     }
 
 
