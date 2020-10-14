@@ -21,6 +21,7 @@ import model.Money;
 
 import java.io.*;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -77,10 +78,10 @@ public class TransactionController implements Initializable {
         transactionDateColumn.setSortType(TableColumn.SortType.DESCENDING);
         transactionList = FXCollections.observableArrayList(readFile());
 //        if (transactionList.size() == 0)
-            allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
+        allTransactionTable.setPlaceholder(new Label("Bạn chưa có giao dịch nào."));
 //        else {
-            addTransactionToTable(transactionList);
-            allTransactionTable.refresh();
+        addTransactionToTable(transactionList);
+        allTransactionTable.refresh();
 //        }
         amountText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
@@ -139,7 +140,7 @@ public class TransactionController implements Initializable {
 
 
     // Save button
-    public void saveTransaction(ActionEvent actionEvent)  {
+    public void saveTransaction(ActionEvent actionEvent) {
         if (hiddenUUID.getText().trim().isEmpty()) {
             Money money = getInputMoneyObj();
             generateUUID(money);
@@ -222,9 +223,13 @@ public class TransactionController implements Initializable {
     }
 
     private void setLabel() {
-        totalIncomeLabel.setText(String.valueOf(totalIncome));
-        totalOutcomeLabel.setText(String.valueOf(totalOutcome));
-        realMoneyLabel.setText(String.valueOf(totalIncome - totalOutcome));
+        String incomeLabel = addCommaToMoney(String.valueOf(totalIncome));
+        totalIncomeLabel.setText(incomeLabel);
+        String outcomeLabel = addCommaToMoney(String.valueOf(totalOutcome));
+        totalOutcomeLabel.setText(outcomeLabel);
+        long realMoney = totalIncome - totalOutcome;
+        String realMoneyLb = addCommaToMoney(String.valueOf(realMoney));
+        realMoneyLabel.setText(realMoneyLb);
     }
 
     // Action when user tap a cell in table
@@ -432,11 +437,10 @@ public class TransactionController implements Initializable {
     }
 
     public void sortChoiceboxSelected(int number) {
-        if (number == 0){
+        if (number == 0) {
             sortTransactionList();
             addTransactionToTable(transactionList);
-        }
-        else if (number == 1)
+        } else if (number == 1)
             addTransactionToTable(getOnlyIncomeList());
         else
             addTransactionToTable(getOnlyOutcomeList());
@@ -444,33 +448,27 @@ public class TransactionController implements Initializable {
     }
 
     // Code for check required field and enable save button
-    public void checkRequiredFields(){
+    public void checkRequiredFields() {
         saveTransactionBtn.disableProperty().bind(
                 amountText.textProperty().isEmpty()
-                        .or( transactionGroup.valueProperty().isNull() )
-                        .or( transactionDate.valueProperty().isNull() ) );
+                        .or(transactionGroup.valueProperty().isNull())
+                        .or(transactionDate.valueProperty().isNull()));
     }
 
-    //
-//   public ObservableList<Money> getSortedTransactionList(){
-//        ObservableList<Money> observableList = FXCollections.observableArrayList();
-//        observableList = transactionList;
-//        Collections.sort(observableList, new Comparator<Money>() {
-//            @Override
-//            public int compare(Money o1, Money o2) {
-//                return (o1.getDate().isAfter(o2.getDate())? 1: -1);
-//            }
-//        });
-//        return observableList;
-//   }
-       public void sortTransactionList(){
+    public void sortTransactionList() {
         Collections.sort(transactionList, new Comparator<Money>() {
             @Override
             public int compare(Money o1, Money o2) {
-                return (o1.getDate().isBefore(o2.getDate())? 1: -1);
+                return (o1.getDate().isBefore(o2.getDate()) ? 1 : -1);
             }
         });
-   }
+    }
+
+    public String addCommaToMoney(String string) {
+        NumberFormat nf = NumberFormat.getInstance(new Locale("en", "US"));
+        String price = nf.format(Integer.parseInt(string));
+        return price;
+    }
 }
 
 

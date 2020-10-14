@@ -11,6 +11,8 @@ import javafx.stage.WindowEvent;
 import model.Money;
 
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class Main extends Application {
     public static void main(String[] args) {
@@ -29,7 +31,9 @@ public class Main extends Application {
                 transactionController.writeFile();
             }
         });
-
+        NumberFormat nf = NumberFormat.getInstance(new Locale("en", "US"));
+        String price = nf.format(Integer.parseInt("500000"));
+        System.out.println(price);
     }
 
 }
